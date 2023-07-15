@@ -1,6 +1,19 @@
 import numpy as np
 from DH_parameter import common_DH_parameters as DH_parameters
 
+# Function to calculate DH matrix
+# Input: theta, d, a, alpha
+# Output: DH matrix
+def DH_matrix(theta, d, a, alpha):
+    J = np.array([[np.cos(theta),  -np.sin(theta) * np.cos(alpha), np.sin(theta) * np.sin(alpha), a * np.cos(theta)], 
+                    [np.sin(theta), np.cos(theta) * np.cos(alpha), -np.cos(theta) * np.sin(alpha), a * np.sin(theta)],
+                    [0, np.sin(alpha), np.cos(alpha), d],
+                    [0, 0, 0, 1]])  
+    return J
+    
+# Function to calculate forward kinematics
+# Input: Joint angles in degrees    
+# Output: x, y, z position and roll, pitch, yaw angles in radians
 def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint_angle4, Joint_angle5, Joint_angle6):
     DH = DH_parameters()
     Theta1 = np.deg2rad(Joint_angle1)
@@ -11,48 +24,22 @@ def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint
     Theta6 = np.deg2rad(Joint_angle6)
 
     # calculating J1 to J6 _Frame transformation matrices
-
     work_frame = np.array([[1, 0, 0, 0],
                           [0, 1, 0, 0],
                           [0, 0, 1, 0],
-                          [0, 0, 0, 1]]) 
-    
+                          [0, 0, 0, 1]])  
     tool_frame = np.array([[1, 0, 0, 0],
                           [0, 1, 0, 0],
                           [0, 0, 1, 0],
                           [0, 0, 0, 1]])
     
-   
-    J1 = np.array([[np.cos(Theta1),  -np.sin(Theta1)*np.cos(DH.alpha1), np.sin(Theta1)*np.sin(DH.alpha1), DH.a1*np.cos(Theta1)], 
-                    [np.sin(Theta1), np.cos(Theta1)*np.cos(DH.alpha1), -np.cos(Theta1)*np.sin(DH.alpha1), DH.a1*np.sin(Theta1)],
-                    [0, np.sin(DH.alpha1), np.cos(DH.alpha1), DH.d1],
-                    [0, 0, 0, 1]])
-    
-    J2 = np.array([[np.cos(Theta2),  -np.sin(Theta2)*np.cos(DH.alpha2), np.sin(Theta2)*np.sin(DH.alpha2), DH.a2*np.cos(Theta2)],
-                    [np.sin(Theta2), np.cos(Theta2)*np.cos(DH.alpha2), -np.cos(Theta2)*np.sin(DH.alpha2), DH.a2*np.sin(Theta2)],
-                    [0, np.sin(DH.alpha2), np.cos(DH.alpha2), DH.d2],
-                    [0, 0, 0, 1]])
-    
-    J3 = np.array([[np.cos(Theta3),  -np.sin(Theta3)*np.cos(DH.alpha3), np.sin(Theta3)*np.sin(DH.alpha3), DH.a3*np.cos(Theta3)],
-                    [np.sin(Theta3), np.cos(Theta3)*np.cos(DH.alpha3), -np.cos(Theta3)*np.sin(DH.alpha3), DH.a3*np.sin(Theta3)],
-                    [0, np.sin(DH.alpha3), np.cos(DH.alpha3), DH.d3],
-                    [0, 0, 0, 1]])
+    J1 = DH_matrix(Theta1, DH.d1, DH.a1, DH.alpha1)   
+    J2 = DH_matrix(Theta2, DH.d2, DH.a2, DH.alpha2)
+    J3 = DH_matrix(Theta3, DH.d3, DH.a3, DH.alpha3)
+    J4 = DH_matrix(Theta4, DH.d4, DH.a4, DH.alpha4)
+    J5 = DH_matrix(Theta5, DH.d5, DH.a5, DH.alpha5)
+    J6 = DH_matrix(Theta6, DH.d6, DH.a6, DH.alpha6)
 
-    J4 = np.array([[np.cos(Theta4),  -np.sin(Theta4)*np.cos(DH.alpha4), np.sin(Theta4)*np.sin(DH.alpha4), DH.a4*np.cos(Theta4)],
-                    [np.sin(Theta4), np.cos(Theta4)*np.cos(DH.alpha4), -np.cos(Theta4)*np.sin(DH.alpha4), DH.a4*np.sin(Theta4)],
-                    [0, np.sin(DH.alpha4), np.cos(DH.alpha4), DH.d4],
-                    [0, 0, 0, 1]])
-
-    J5 = np.array([[np.cos(Theta5),  -np.sin(Theta5)*np.cos(DH.alpha5), np.sin(Theta5)*np.sin(DH.alpha5), DH.a5*np.cos(Theta5)],
-                    [np.sin(Theta5), np.cos(Theta5)*np.cos(DH.alpha5), -np.cos(Theta5)*np.sin(DH.alpha5), DH.a5*np.sin(Theta5)],
-                    [0, np.sin(DH.alpha5), np.cos(DH.alpha5), DH.d5],
-                    [0, 0, 0, 1]])
-
-    J6 = np.array([[np.cos(Theta6),  -np.sin(Theta6)*np.cos(DH.alpha6), np.sin(Theta6)*np.sin(DH.alpha6), DH.a6*np.cos(Theta6)],
-                    [np.sin(Theta6), np.cos(Theta6)*np.cos(DH.alpha6), -np.cos(Theta6)*np.sin(DH.alpha6), DH.a6*np.sin(Theta6)],
-                    [0, np.sin(DH.alpha6), np.cos(DH.alpha6), DH.d6],
-                    [0, 0, 0, 1]])
-    
     # calculating T1 to T6 _Frame transformation matrices
     T1 = np.dot(J1, work_frame)
     T2 = np.dot(T1, J2)
