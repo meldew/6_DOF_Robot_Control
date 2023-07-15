@@ -1,4 +1,5 @@
 import numpy as np
+import math as m
 from DH_parameter import common_DH_parameters as DH_parameters
 
 # Function to calculate DH matrix
@@ -6,9 +7,9 @@ from DH_parameter import common_DH_parameters as DH_parameters
 # Output: DH matrix
 def DH_matrix(theta, d, a, alpha):
     J = np.array([[np.cos(theta),  -np.sin(theta) * np.cos(alpha), np.sin(theta) * np.sin(alpha), a * np.cos(theta)], 
-                    [np.sin(theta), np.cos(theta) * np.cos(alpha), -np.cos(theta) * np.sin(alpha), a * np.sin(theta)],
-                    [0, np.sin(alpha), np.cos(alpha), d],
-                    [0, 0, 0, 1]])  
+                  [np.sin(theta), np.cos(theta) * np.cos(alpha), -np.cos(theta) * np.sin(alpha), a * np.sin(theta)],
+                  [0, np.sin(alpha), np.cos(alpha), d],
+                  [0, 0, 0, 1]])  
     return J
     
 # Function to calculate forward kinematics
@@ -18,10 +19,10 @@ def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint
     DH = DH_parameters()
     Theta1 = np.deg2rad(Joint_angle1)
     Theta2 = np.deg2rad(Joint_angle2)
-    Theta3 = np.deg2rad(Joint_angle3)
+    Theta3 = np.deg2rad((Joint_angle3) - 90)
     Theta4 = np.deg2rad(Joint_angle4)
     Theta5 = np.deg2rad(Joint_angle5)
-    Theta6 = np.deg2rad(Joint_angle6)
+    Theta6 = np.deg2rad((Joint_angle6) + 180)
 
     # calculating J1 to J6 _Frame transformation matrices
     work_frame = np.array([[1, 0, 0, 0],
@@ -52,9 +53,12 @@ def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint
     x_position = T6[0,3]
     y_position = T6[1,3]
     z_position = T6[2,3]
+    
+    pitch = m.atan2(np.sqrt((m.pow(T_frame[0, 2],2)) + (m.pow(T_frame[1, 2],2))), -T_frame[2, 2])
+    yaw = m.atan2(T_frame[2, 0] / pitch, T_frame[2, 1] / pitch)
+    roll = m.atan2(T_frame[0, 2] / pitch, T_frame[1, 2] / pitch)
 
-    pitch = np.arctan2(-T_frame[2, 2], np.sqrt(T_frame[0, 2] ** 2 + T_frame[1, 2] ** 2))
-    yaw = np.arctan2(T_frame[2, 1] / np.cos(pitch), T_frame[2, 0] / np.cos(pitch))
-    roll = np.arctan2(T_frame[1, 2] / np.cos(pitch), T_frame[0, 2] / np.cos(pitch))
-
-    return x_position, y_position, z_position, roll, pitch, yaw
+    print(-T_frame[2, 2])
+    print(T_frame[0, 2])
+    print(T_frame[1, 2])
+    return x_position, y_position, z_position, np.rad2deg(roll), np.rad2deg(pitch), np.rad2deg(yaw)
