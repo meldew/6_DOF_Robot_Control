@@ -58,7 +58,4 @@ def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint
     yaw = m.atan2(T_frame[2, 0] / pitch, T_frame[2, 1] / pitch)
     roll = m.atan2(T_frame[0, 2] / pitch, T_frame[1, 2] / pitch)
 
-    print(-T_frame[2, 2])
-    print(T_frame[0, 2])
-    print(T_frame[1, 2])
     return x_position, y_position, z_position, np.rad2deg(roll), np.rad2deg(pitch), np.rad2deg(yaw)
