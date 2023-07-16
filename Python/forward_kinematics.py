@@ -1,6 +1,7 @@
 import numpy as np
 import math as m
-from DH_parameter import common_DH_parameters as DH_parameters
+from Common import common_DH_parameters as DH_parameters
+from Common import Common_Matrices
 
 # Function to calculate DH matrix
 # Input: theta, d, a, alpha
@@ -25,15 +26,6 @@ def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint
     Theta6 = np.deg2rad((Joint_angle6) + 180)
 
     # calculating J1 to J6 _Frame transformation matrices
-    work_frame = np.array([[1, 0, 0, 0],
-                          [0, 1, 0, 0],
-                          [0, 0, 1, 0],
-                          [0, 0, 0, 1]])  
-    tool_frame = np.array([[1, 0, 0, 0],
-                          [0, 1, 0, 0],
-                          [0, 0, 1, 0],
-                          [0, 0, 0, 1]])
-    
     J1 = DH_matrix(Theta1, DH.d1, DH.a1, DH.alpha1)   
     J2 = DH_matrix(Theta2, DH.d2, DH.a2, DH.alpha2)
     J3 = DH_matrix(Theta3, DH.d3, DH.a3, DH.alpha3)
@@ -42,13 +34,13 @@ def calculate_forward_kinematics(Joint_angle1, Joint_angle2, Joint_angle3, Joint
     J6 = DH_matrix(Theta6, DH.d6, DH.a6, DH.alpha6)
 
     # calculating T1 to T6 _Frame transformation matrices
-    T1 = np.dot(J1, work_frame)
+    T1 = np.dot(J1, Common_Matrices.work_frame)
     T2 = np.dot(T1, J2)
     T3 = np.dot(T2, J3)
     T4 = np.dot(T3, J4)
     T5 = np.dot(T4, J5)
     T6 = np.dot(T5, J6)
-    T_frame = np.dot(T6, tool_frame)
+    T_frame = np.dot(T6, Common_Matrices.tool_frame)
 
     x_position = T6[0,3]
     y_position = T6[1,3]

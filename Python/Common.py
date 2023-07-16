@@ -18,8 +18,15 @@ class common_DH_parameters:
     alpha5 = np.deg2rad(90)
     alpha6 = np.deg2rad(0)
 
-
-
+class Common_Matrices: 
+    work_frame = np.array([[1, 0, 0, 0],
+                          [0, 1, 0, 0],
+                          [0, 0, 1, 0],
+                          [0, 0, 0, 1]])  
+    tool_frame = np.array([[1, 0, 0, 0],
+                          [0, 1, 0, 0],
+                          [0, 0, 1, 0],
+                          [0, 0, 0, 1]])
     
   
 
