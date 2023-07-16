@@ -40,6 +40,8 @@ def calculate_inverse_kinematics(x, y, z, yaw, pitch, roll, Feedback_Joint_angle
                                       [T3[2,0], T3[2,1], T3[2,2]]])
     
     R_0_3_Transposed = np.transpose(R_0_3_rotation_matrix)
+
+    # Now we find the rotation matrix from the J3 frame to the J6 frame
     T_0_T_offset = np.dot(Overall_tool_translation_matrix(x, y, z, yaw, pitch, roll), CM.work_frame)
     T_0_T_offset[0,0] = T_0_T_offset[0,0]*-1
     Tool_frame_inverted = np.transpose(CM.tool_frame)
@@ -55,5 +57,6 @@ def calculate_inverse_kinematics(x, y, z, yaw, pitch, roll, Feedback_Joint_angle
     central_wrist_Rot = np.array([[center_spherical_wrist[0,0], center_spherical_wrist[0,1], center_spherical_wrist[0,2]],
                                     [center_spherical_wrist[1,0], center_spherical_wrist[1,1], center_spherical_wrist[1,2]],
                                     [center_spherical_wrist[2,0], center_spherical_wrist[2,1], center_spherical_wrist[2,2]]])
-
-    R_3_6_O_orientation_matrix = R_0_3_Transposed.dot(central_wrist_Rot)
+    
+    # Now we mathematically connect previously decoupled 0 to 3 rotation matrix to the 3 to 6 rotation matrix
+    R_3_6_orientation_matrix = R_0_3_Transposed.dot(central_wrist_Rot)
