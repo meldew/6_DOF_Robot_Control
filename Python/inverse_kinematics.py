@@ -130,6 +130,4 @@ def calculate_inverse_kinematics(x, y, z, yaw, pitch, roll, Feedback_Joint_angle
     if pX_a1_FWD < 0: J3 = J3_MID
     else: J3 = J3_FWD
 
-    print(J4_pos, J4_neg, J5_pos, J5_neg, J6_pos, J6_neg)
-
     return J1, J2, J3, J4, J5, J6
