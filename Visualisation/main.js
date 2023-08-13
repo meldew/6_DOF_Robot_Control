@@ -37,12 +37,12 @@ render.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( render.domElement );
 
 //Camera position and axis helper
-camera.position.set( 0.7, 0.7, 0.7 );
+camera.position.set( 0.7, 0.7, 0.8 );
 const axesHelper = new THREE.AxesHelper( 3 );
 scene.add( axesHelper );
 
 // Light
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.3 );
 directionalLight.position.set( 15, 10, 2 );
 scene.add( directionalLight );
 
