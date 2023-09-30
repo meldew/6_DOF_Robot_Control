@@ -4,8 +4,6 @@ from Common import Common_Matrices as CM
 from Common import common_DH_parameters as DH_parameters
 
 # Here i am using the Kinematic decoupling where i am separating the first 3 joints from the last 3 joints
-
-
 def Overall_tool_translation_matrix(x, y, z, yaw, pitch, roll):
     alpha = np.deg2rad(yaw)
     beta = np.deg2rad(pitch)
