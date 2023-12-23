@@ -1,3 +1,4 @@
+console.log('main.js loaded');
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -124,6 +125,7 @@ function animate() {
 
 if ( WebGL.isWebGLAvailable() ) {
     render.setAnimationLoop( animate );
+    console.info('This is an informational message');
 } else {
     const warning = WebGL.getWebGLErrorMessage();
 	document.getElementById( 'container' ).appendChild( warning );
