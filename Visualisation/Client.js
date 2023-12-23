@@ -1,9 +1,7 @@
 
-console.log('J_Client.js loaded');
 const WebSocket = require('ws');
 
 const socket = new WebSocket('ws://127.0.0.1:8765');
-const storedData = []; // Array to store the received data
 
 socket.on('open', () => {
     console.log('WebSocket connection opened');
@@ -13,6 +11,7 @@ socket.on('open', () => {
 console.log('WebSocket client created');
 socket.on('message', (data) => {
     console.log(`WebSocket message received: ${data}`);
+    module.exports = {data};
     const sensorData = { message: 'Not for now data from JavaScript'};
     socket.send(JSON.stringify(sensorData));
     
