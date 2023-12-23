@@ -17,7 +17,7 @@ async def handle(websocket, path):
         # Send the JSON string to the client
         await websocket.send(response_json)
 
-start_server = websockets.serve(handle, 'localhost', 8765)
+start_server = websockets.serve(handle, '127.0.0.1', 8765)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
