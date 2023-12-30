@@ -15,6 +15,7 @@ var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
 var xAxis = new THREE.Vector3(1, 0, 0);
 
+
 var options = {
     'Link1': 0,
     'Link2': 0,
@@ -115,7 +116,7 @@ loader.load('assets/6DOF_gltf_files/link_4.gltf', function ( gltf ) {
 },  undefined, function ( error ) {console.error( error );});
 
 function animate() {  
-	stats.update();
+    stats.update();
     shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
     joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);

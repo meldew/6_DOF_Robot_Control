@@ -1,3 +1,3 @@
-const { data } = require('../Visualisation/Client.js');
+const { data } = require('./Client.js');
 
 console.log(data);
