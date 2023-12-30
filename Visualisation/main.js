@@ -54,6 +54,7 @@ orbit.update();
 render.setClearColor(0xbfe3dd); 
 
 // DAT.GUI Related Stuff
+
 function createPanel() {
     const gui = new GUI();
     const folder1 = gui.addFolder( 'Robot Link Control' );
@@ -121,6 +122,10 @@ function animate() {
     joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
+    //shoulder.setRotationFromAxisAngle(zAxis, -90 * Math.PI/180);
+    //joint2.setRotationFromAxisAngle(xAxis, 0 * Math.PI/180);
+    //joint3.setRotationFromAxisAngle(zAxis, 0 * Math.PI/180);
+    //joint4.setRotationFromAxisAngle(xAxis, 90 * Math.PI/180);
 	render.render( scene, camera );
 }   
 

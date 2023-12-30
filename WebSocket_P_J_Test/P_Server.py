@@ -2,9 +2,9 @@ import asyncio
 import websockets
 import json  # Import the json module for JSON serialization
 
-J1 = 0
-J2 = 0
-J3 = 0
+J1 = 65
+J2 = 30
+J3 = 60
 J4 = 0
 J5 = 0
 J6 = 0
