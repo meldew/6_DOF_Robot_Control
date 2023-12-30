@@ -1,0 +1,107 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 37998,
+      "type": "SCALAR",
+      "max": [
+        34168
+      ],
+      "min": [
+        0
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 34169,
+      "type": "VEC3",
+      "max": [
+        0.18246601521968842,
+        0.03799999877810478,
+        0.04894600063562393
+      ],
+      "min": [
+        -0.037999365478754044,
+        -0.29413503408432007,
+        -0.07962899655103683
+      ],
+      "name": "POSITION"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "count": 34169,
+      "type": "VEC3",
+      "max": [
+        1.0000042915344238,
+        1.0000044107437134,
+        1.0000044107437134
+      ],
+      "min": [
+        -1.0000042915344238,
+        -1.0000044107437134,
+        -1.0000044107437134
+      ],
+      "name": "NORMAL"
+    }
+  ],
+  "asset": {
+    "generator": "Aspose.3D 23.6.0",
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "uri": "link_2_data.bin",
+      "byteLength": 987948
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 75996,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 75996,
+      "byteLength": 911952,
+      "byteStride": 24,
+      "target": 34962
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2
+          },
+          "indices": 0,
+          "mode": 4
+        }
+      ],
+      "name": ""
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": ""
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}
