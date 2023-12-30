@@ -31,3 +31,11 @@ socket.on('error', (error) => {
     console.error('WebSocket error:', error);
 });
 
+// const client = require('./Client.js'); // Import the Client.js file
+// const receivedLinkAngles = client.linkAngles;
+// options.Link1 = receivedLinkAngles[0];
+// options.Link2 = receivedLinkAngles[1];
+// options.Link3 = receivedLinkAngles[2];
+// options.Link4 = receivedLinkAngles[3];
+// options.Link5 = receivedLinkAngles[4];
+// options.Link6 = receivedLinkAngles[5];

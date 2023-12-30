@@ -64,6 +64,7 @@ function createPanel() {
     folder1.add(options, 'Link4', -180, 180).listen();
     folder1.add(options, 'Link5', -180, 180).listen();
     folder1.add(options, 'Link6', -180, 180).listen();
+
     folder1.open();
 }
 
