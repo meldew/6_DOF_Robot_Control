@@ -50,8 +50,9 @@ async def send_values(websocket, path):
             J1 += J1direction  
             J2 += J2direction
             J3 += J3direction
-            J4 += J4direction * 3
-                    
+            J4 += J4direction * 3 
+
+                     
             # Wait for a while before sending the values again
             await asyncio.sleep(0.02)
             
