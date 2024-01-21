@@ -50,6 +50,9 @@ camera.position.set( 0.7, 0.7, 0.8 );
 const axesHelper = new THREE.AxesHelper( 3 );
 scene.add( axesHelper );
 
+const grid = new THREE.GridHelper( 5, 50 );
+scene.add( grid );
+
 // Light
 const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.3 );
 directionalLight.position.set( 15, 10, 2 );
