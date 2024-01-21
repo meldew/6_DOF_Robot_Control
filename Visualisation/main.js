@@ -7,6 +7,7 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
+const socket = new WebSocket('ws://127.0.0.1:8765');
 const shoulder = new THREE.Object3D();
 const joint2 = new THREE.Object3D();
 const joint3 = new THREE.Object3D();
@@ -15,6 +16,12 @@ var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
 var xAxis = new THREE.Vector3(1, 0, 0);
 
+let J1 = 0;
+let J2 = 0;
+let J3 = 0;
+let J4 = 0;
+let J5 = 0;
+let J6 = 0;
 
 var options = {
     'Link1': 0,
@@ -117,16 +124,44 @@ loader.load('assets/6DOF_gltf_files/link_4.gltf', function ( gltf ) {
     joint4.add( link4 );
 },  undefined, function ( error ) {console.error( error );});
 
+
+socket.addEventListener('open', event => {
+    console.log('Connected to WebSocket server');
+});
+
+socket.addEventListener('error', error => {
+    console.error('Error connecting to WebSocket server:', error);
+});
+
+socket.addEventListener('message', event => {
+    try {
+        const values = JSON.parse(event.data);
+        
+        // Access the values
+        J1 = values.J1;
+        J2 = values.J2;
+        J3 = values.J3;
+        J4 = values.J4;
+        console.log('J1: ', J1);
+        console.log('J2: ', J2);
+        console.log('J3: ', J3);
+        console.log('J4: ', J4);
+    } catch (error) {
+        console.error('Error processing message:', error);
+    }
+});
+
 function animate() {  
     stats.update();
-    shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
-    joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
-    joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
-    joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
-    //shoulder.setRotationFromAxisAngle(zAxis, -90 * Math.PI/180);
-    //joint2.setRotationFromAxisAngle(xAxis, 0 * Math.PI/180);
-    //joint3.setRotationFromAxisAngle(zAxis, 0 * Math.PI/180);
-    //joint4.setRotationFromAxisAngle(xAxis, 90 * Math.PI/180);
+
+    //shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
+    //joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
+    //joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
+    //joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
+    shoulder.setRotationFromAxisAngle(zAxis, J1 * Math.PI/180);
+    joint2.setRotationFromAxisAngle(xAxis, J2 * Math.PI/180);
+    joint3.setRotationFromAxisAngle(zAxis, J3 * Math.PI/180);
+    joint4.setRotationFromAxisAngle(xAxis, J4 * Math.PI/180);
 	render.render( scene, camera );
 }   
 
