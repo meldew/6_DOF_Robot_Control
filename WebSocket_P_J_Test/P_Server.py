@@ -49,7 +49,7 @@ async def send_values(websocket, path):
 
             J1 += J1direction  
             J2 += J2direction
-            J3 += J3direction
+            J3 += J3direction * 3
             J4 += J4direction * 3 
 
                      
