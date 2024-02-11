@@ -12,6 +12,8 @@ const shoulder = new THREE.Object3D();
 const joint2 = new THREE.Object3D();
 const joint3 = new THREE.Object3D();
 const joint4 = new THREE.Object3D();
+const joint5 = new THREE.Object3D();
+
 var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
 var xAxis = new THREE.Vector3(1, 0, 0);
@@ -29,9 +31,8 @@ var options = {
     'Link3': 0,
     'Link4': 0,
     'Link5': 0,
-    'Link6': 0
+    'Link6': 0,
 };
-
 // Stats
 const stats = new Stats();
 document.body.appendChild( stats.dom );
@@ -46,9 +47,7 @@ render.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( render.domElement );
 
 //Camera position and axis helper
-camera.position.set( 0.7, 0.7, 0.8 );
-const axesHelper = new THREE.AxesHelper( 3 );
-scene.add( axesHelper );
+camera.position.set( 0.7, 1, 0.8 );
 
 const grid = new THREE.GridHelper( 5, 50 );
 scene.add( grid );
@@ -74,7 +73,6 @@ function createPanel() {
     folder1.add(options, 'Link4', -180, 180).listen();
     folder1.add(options, 'Link5', -180, 180).listen();
     folder1.add(options, 'Link6', -180, 180).listen();
-
     folder1.open();
 }
 
@@ -89,12 +87,14 @@ loader.load( 'assets/6DOF_gltf_files/base_link.gltf', function ( gltf ) {
     shoulder.translateZ(0.004);
     base.add( shoulder ); 
 },  undefined, function ( error ) {console.error( error );});
+
 loader.load('assets/6DOF_gltf_files/link_1.gltf', function ( gltf ) {
     const link1 = gltf.scene;
     link1.rotateOnAxis(xAxis,  Math.PI);
     shoulder.add( link1 );
     link1.add( joint2 );
 },  undefined, function ( error ) {console.error( error );});
+
 loader.load('assets/6DOF_gltf_files/link_2.gltf', function ( gltf ) {
     const link2 = gltf.scene;
     scene.add(link2);
@@ -108,6 +108,7 @@ loader.load('assets/6DOF_gltf_files/link_2.gltf', function ( gltf ) {
     joint2.add( link2 );
     link2.add( joint3 );
 },  undefined, function ( error ) {console.error( error );});
+
 loader.load('assets/6DOF_gltf_files/link_3.gltf', function ( gltf ) {
     const link3 = gltf.scene;  
     scene.add(link3);
@@ -119,14 +120,30 @@ loader.load('assets/6DOF_gltf_files/link_3.gltf', function ( gltf ) {
     joint3.add( link3 );
     link3.add( joint4 );
 },  undefined, function ( error ) {console.error( error );});
+
 loader.load('assets/6DOF_gltf_files/link_4.gltf', function ( gltf ) {
     const link4 = gltf.scene;
     scene.add(link4);
     link4.rotateOnAxis(yAxis,  3*Math.PI/2);
     link4.rotateOnAxis(zAxis,  15.2*Math.PI/8);
     joint4.add( link4 );
+    link4.add( joint5 );
 },  undefined, function ( error ) {console.error( error );});
 
+loader.load('assets/6DOF_gltf_files/link_5.gltf', function ( gltf ) {
+    const link5 = gltf.scene;
+    scene.add( link5 );
+    
+    joint5.translateZ(-0.222);
+    
+    const link5AxesHelper = new THREE.AxesHelper(0.2);
+    joint5.add(link5AxesHelper);
+    const link5AxesHelper1 = new THREE.AxesHelper(0.2);
+    link5.add(link5AxesHelper1);
+    joint5.add( link5 );
+    
+     
+},  undefined, function ( error ) {console.error( error );});
 
 socket.addEventListener('open', event => {
     console.log('Connected to WebSocket server');
@@ -157,14 +174,19 @@ socket.addEventListener('message', event => {
 function animate() {  
     stats.update();
 
-    //shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
-    //joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
-    //joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
-    //joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
+    shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
+    joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
+    joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
+    joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
+    joint5.setRotationFromAxisAngle(xAxis, options.Link5 * Math.PI/180);
+    
+    
+    /*
     shoulder.setRotationFromAxisAngle(zAxis, J1 * Math.PI/180);
     joint2.setRotationFromAxisAngle(xAxis, J2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, J3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, J4 * Math.PI/180);
+    */
 	render.render( scene, camera );
 }   
 
