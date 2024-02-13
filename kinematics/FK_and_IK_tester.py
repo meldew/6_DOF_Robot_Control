@@ -1,12 +1,12 @@
 import forward_kinematics as FK
 import inverse_kinematics as IK
 
-J1 = 0
-J2 = 0
-J3 = 0
-J4 = 0.01
-J5 = 0.01
-J6 = 0.01
+J1 = -37.85
+J2 = -36.0
+J3 = 92.13
+J4 = -0.68
+J5 = 31.21
+J6 = -40.15
 
 
 Xpos, Ypos, Zpos, roll, pitch, yaw = FK.calculate_forward_kinematics(J1, J2, J3, J4, J5, J6)
