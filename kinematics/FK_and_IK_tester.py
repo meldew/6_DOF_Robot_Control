@@ -1,9 +1,9 @@
 import forward_kinematics as FK
 import inverse_kinematics as IK
 
-J1 = 0.01
-J2 = -90
-J3 = 90
+J1 = 0
+J2 = 0
+J3 = 0
 J4 = 0.01
 J5 = 0.01
 J6 = 0.01
