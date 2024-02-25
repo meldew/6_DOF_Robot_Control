@@ -8,12 +8,7 @@ const int resetHomingButtonPin = 8;
 
 const long stepsPerRevolution = 30620;
 const int stepsFor1Degree = (stepsPerRevolution / 360);
-<<<<<<< HEAD
-const int motorSpeed = 300;
-
-=======
 const int motorSpeed = 400;
->>>>>>> eb8bbe1 (degree feil)
 bool homingComplete = false;
 long currentPosition = 0;
 bool HomingRequest = HIGH;
@@ -57,11 +52,6 @@ void loop() {
       moveMotor(stepsFor1Degree, HIGH);
     } else if (digitalRead(limitSwitchPin2) == LOW) {
       moveMotor(stepsFor1Degree, LOW);
-<<<<<<< HEAD
-    } else if (digitalRead(moveTOButtonPin) == LOW){
-      moveToAngle(targetAngle);
-=======
->>>>>>> eb8bbe1 (degree feil)
     }
     float currentAngle = calculateCurrentAngle();
     Serial.print("Current Angle: ");
