@@ -18,6 +18,7 @@ var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
 var xAxis = new THREE.Vector3(1, 0, 0);
 
+let sendDataIntervalId = null;
 let J1 = 0;
 let J2 = 0;
 let J3 = 0;
@@ -32,6 +33,7 @@ var options = {
     'Link4': 0,
     'Link5': 0,
     'Link6': 0,
+    TransmitData: false,
 };
 // Stats
 const stats = new Stats();
@@ -63,10 +65,10 @@ orbit.update();
 render.setClearColor(0xbfe3dd); 
 
 // DAT.GUI Related Stuff
-
 function createPanel() {
     const gui = new GUI();
     const folder1 = gui.addFolder( 'Robot Link Control' );
+    const folder2 = gui.addFolder( 'Python Duplex Communication' );
     folder1.add(options, 'Link1', -180, 180).listen();
     folder1.add(options, 'Link2', -180, 180).listen();
     folder1.add(options, 'Link3', -180, 180).listen();
@@ -74,10 +76,27 @@ function createPanel() {
     folder1.add(options, 'Link5', -180, 180).listen();
     folder1.add(options, 'Link6', -180, 180).listen();
     folder1.open();
+    
+    folder2.add(options, 'TransmitData').name('Send Data to Python').onChange(function(value) {
+        if (sendDataIntervalId !== null) {
+            clearInterval(sendDataIntervalId);
+            sendDataIntervalId = null;
+        }
+        if (value) {
+            sendDataIntervalId = setInterval(() => {
+                const feedbackValues = options.Link1;
+                socket.send(JSON.stringify(feedbackValues));
+            }, 100);
+        } else {
+            if (sendDataIntervalId !== null) {
+                clearInterval(sendDataIntervalId);
+                sendDataIntervalId = null;
+            }
+        }
+    });
 }
 
 const loader = new GLTFLoader();
-
 createPanel();
 
 loader.load( 'assets/6DOF_gltf_files/base_link.gltf', function ( gltf ) {
@@ -147,11 +166,13 @@ loader.load('assets/6DOF_gltf_files/link_5.gltf', function ( gltf ) {
 
 socket.addEventListener('open', event => {
     console.log('Connected to WebSocket server');
+    
 });
 
 socket.addEventListener('error', error => {
     console.error('Error connecting to WebSocket server:', error);
 });
+
 
 socket.addEventListener('message', event => {
     try {
@@ -162,10 +183,10 @@ socket.addEventListener('message', event => {
         J2 = values.J2;
         J3 = values.J3;
         J4 = values.J4;
-        console.log('J1: ', J1);
-        console.log('J2: ', J2);
-        console.log('J3: ', J3);
-        console.log('J4: ', J4);
+        //console.log('J1: ', J1);
+        //console.log('J2: ', J2);
+        //console.log('J3: ', J3);
+        //console.log('J4: ', J4);
     } catch (error) {
         console.error('Error processing message:', error);
     }
@@ -179,7 +200,6 @@ function animate() {
     joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
     joint5.setRotationFromAxisAngle(xAxis, options.Link5 * Math.PI/180);
-    
     
     /*
     shoulder.setRotationFromAxisAngle(zAxis, J1 * Math.PI/180);
