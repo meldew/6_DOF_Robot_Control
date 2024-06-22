@@ -13,12 +13,16 @@ const joint2 = new THREE.Object3D();
 const joint3 = new THREE.Object3D();
 const joint4 = new THREE.Object3D();
 const joint5 = new THREE.Object3D();
+const buttonDelaytime = 200; 
 
 var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
 var xAxis = new THREE.Vector3(1, 0, 0);
 
 let sendDataIntervalId = null;
+
+
+
 let J1 = 0;
 let J2 = 0;
 let J3 = 0;
@@ -34,15 +38,50 @@ var options = {
     'Link5': 0,
     'Link6': 0,
     TransmitData: false,
-    sendHomingRequest: function() {
-        const homingMessageOn = { type: 'homing', value: 1 };
-        const homingMessageOff = { type: 'homing', value: 0 };
-        socket.send(JSON.stringify(homingMessageOn));
-        setTimeout(() => {
-            socket.send(JSON.stringify(homingMessageOff));
-        }, 100); // Adjust the delay as needed
+    sendMoveToAngleRequest: function() {
+        if (options.TransmitData) {
+            const moveToAngleMessageOn = { type: 'MoveToAngle', value: 1 };
+            const moveToAngleMessageOff = { type: 'MoveToAngle', value: 0 };
+            socket.send(JSON.stringify(moveToAngleMessageOn));
+            setTimeout(() => {
+                socket.send(JSON.stringify(moveToAngleMessageOff));
+            }, buttonDelaytime);
+        } else {
+            console.log("TransmitData is disabled, not sending move to angle request");
+        }
+    },
+    sendHomeRequest: function() {
+        if (options.TransmitData) {
+            const HomeMessageOn = { type: 'Home', value: 1 };
+            const HomeMessageOff = { type: 'Home', value: 0 };
+            socket.send(JSON.stringify(HomeMessageOn));
+            setTimeout(() => {
+                socket.send(JSON.stringify(HomeMessageOff));
+            }, buttonDelaytime);
+        } else {
+            console.log("TransmitData is disabled, not sending move to angle request");
+        }
     }
 };
+
+function sendMoveJointToLeftMessage(value) {
+    if (options.TransmitData) {
+        const moveJointToLeftMessage = { type: 'MoveJointToLeft', value: value };
+        socket.send(JSON.stringify(moveJointToLeftMessage));
+    } else {
+        console.log("TransmitData is disabled, not sending move joint to left request");
+    }
+}
+
+function sendMoveJointToRightMessage(value) {
+    if (options.TransmitData) {
+        const moveJointToRightMessage = { type: 'MoveJointToRight', value: value };
+        socket.send(JSON.stringify(moveJointToRightMessage));
+    } else {
+        console.log("TransmitData is disabled, not sending move joint to left request");
+    }
+}
+
 // Stats
 const stats = new Stats();
 document.body.appendChild( stats.dom );
@@ -72,6 +111,19 @@ const orbit = new OrbitControls( camera, render.domElement )
 orbit.update();
 render.setClearColor(0xbfe3dd); 
 
+function createButton(name, onMouseDown, onMouseUp) {
+    const button = document.createElement('button');
+    button.innerHTML = name;
+    button.style.position = 'relative';
+    button.style.right = '-5px';
+    button.style.top = '-4px';
+    button.style.width = '96%';
+    button.style.marginTop = '4px';
+    button.addEventListener('mousedown', onMouseDown);
+    button.addEventListener('mouseup', onMouseUp);
+    return button;
+}
+
 // DAT.GUI Related Stuff
 function createPanel() {
     const gui = new GUI();
@@ -93,19 +145,45 @@ function createPanel() {
         }
         if (value) {
             sendDataIntervalId = setInterval(() => {
-                const feedbackValue = options.Link1;
-                socket.send(JSON.stringify(feedbackValue));
+                
             }, 100);
         } else {
             if (sendDataIntervalId !== null) {
                 clearInterval(sendDataIntervalId);
                 sendDataIntervalId = null;
             }
-        }
+        } 
     });
-    folder2.add(options, 'sendHomingRequest').name('Home');
-}
 
+    folder2.add(options, 'sendMoveToAngleRequest').name('Move to angle');
+    folder2.add(options, 'sendHomeRequest').name('Home');
+    
+    const folder2Title = folder2.domElement.querySelector('.title');
+    const customContainer = document.createElement('div');
+    const moveJointToLeftButton = createButton(
+        'Move Joint to Left',
+        () => sendMoveJointToLeftMessage(1),
+        () => sendMoveJointToLeftMessage(0)
+    );
+
+    const moveJointToRightButton = createButton(
+        'Move Joint to Left',
+        () => sendMoveJointToRightMessage(1),
+        () => sendMoveJointToRightMessage(0)
+    );
+    
+    customContainer.appendChild(moveJointToLeftButton);
+    customContainer.appendChild(moveJointToRightButton);
+    gui.domElement.appendChild(customContainer);
+    
+
+    if (folder2Title) {
+        folder2Title.addEventListener('click', () => {
+            const display1 = customContainer.style.display === 'none' ? 'block' : 'none';
+            customContainer.style.display = display1;
+        });
+    }
+}
 const loader = new GLTFLoader();
 createPanel();
 
@@ -182,7 +260,6 @@ socket.addEventListener('open', event => {
 socket.addEventListener('error', error => {
     console.error('Error connecting to WebSocket server:', error);
 });
-
 
 socket.addEventListener('message', event => {
     try {
