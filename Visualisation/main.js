@@ -34,6 +34,14 @@ var options = {
     'Link5': 0,
     'Link6': 0,
     TransmitData: false,
+    sendHomingRequest: function() {
+        const homingMessageOn = { type: 'homing', value: 1 };
+        const homingMessageOff = { type: 'homing', value: 0 };
+        socket.send(JSON.stringify(homingMessageOn));
+        setTimeout(() => {
+            socket.send(JSON.stringify(homingMessageOff));
+        }, 100); // Adjust the delay as needed
+    }
 };
 // Stats
 const stats = new Stats();
@@ -67,8 +75,9 @@ render.setClearColor(0xbfe3dd);
 // DAT.GUI Related Stuff
 function createPanel() {
     const gui = new GUI();
-    const folder1 = gui.addFolder( 'Robot Link Control' );
+    const folder1 = gui.addFolder( 'Robot Forward Kinematics' );
     const folder2 = gui.addFolder( 'Python Duplex Communication' );
+
     folder1.add(options, 'Link1', -180, 180).listen();
     folder1.add(options, 'Link2', -180, 180).listen();
     folder1.add(options, 'Link3', -180, 180).listen();
@@ -84,8 +93,8 @@ function createPanel() {
         }
         if (value) {
             sendDataIntervalId = setInterval(() => {
-                const feedbackValues = options.Link1;
-                socket.send(JSON.stringify(feedbackValues));
+                const feedbackValue = options.Link1;
+                socket.send(JSON.stringify(feedbackValue));
             }, 100);
         } else {
             if (sendDataIntervalId !== null) {
@@ -94,6 +103,7 @@ function createPanel() {
             }
         }
     });
+    folder2.add(options, 'sendHomingRequest').name('Home');
 }
 
 const loader = new GLTFLoader();

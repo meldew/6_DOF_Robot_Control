@@ -20,7 +20,6 @@ async def handle_client(websocket, path):
                 incoming_msg = await asyncio.wait_for(websocket.recv(), timeout=0.1)
                 print(f"Received message: {incoming_msg}")
 
-
             except asyncio.TimeoutError:
                 pass
 
