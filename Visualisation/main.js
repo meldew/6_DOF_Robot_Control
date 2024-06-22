@@ -21,8 +21,6 @@ var xAxis = new THREE.Vector3(1, 0, 0);
 
 let sendDataIntervalId = null;
 
-
-
 let J1 = 0;
 let J2 = 0;
 let J3 = 0;
