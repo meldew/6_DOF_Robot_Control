@@ -146,7 +146,8 @@ function createPanel() {
         }
         if (value) {
             sendDataIntervalId = setInterval(() => {
-                // Add data, peew peew peew 
+                const testMessage = { type: 'Home', value: options.Link1 };
+                //socket.send(JSON.stringify(testMessage)); // Add data, peew peew peew 
             }, 100);
         } else {
             if (sendDataIntervalId !== null) {
