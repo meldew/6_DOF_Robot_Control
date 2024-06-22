@@ -121,6 +121,7 @@ function createButton(name, onMouseDown, onMouseUp) {
     button.style.marginTop = '4px';
     button.addEventListener('mousedown', onMouseDown);
     button.addEventListener('mouseup', onMouseUp);
+
     return button;
 }
 
@@ -145,7 +146,7 @@ function createPanel() {
         }
         if (value) {
             sendDataIntervalId = setInterval(() => {
-                
+                // Add data, peew peew peew 
             }, 100);
         } else {
             if (sendDataIntervalId !== null) {
@@ -159,13 +160,14 @@ function createPanel() {
     folder2.add(options, 'sendHomeRequest').name('Home');
     
     const folder2Title = folder2.domElement.querySelector('.title');
+    const gui2Title = gui.domElement.querySelector('.title');
     const customContainer = document.createElement('div');
+
     const moveJointToLeftButton = createButton(
         'Move Joint to Left',
         () => sendMoveJointToLeftMessage(1),
         () => sendMoveJointToLeftMessage(0)
     );
-
     const moveJointToRightButton = createButton(
         'Move Joint to Left',
         () => sendMoveJointToRightMessage(1),
@@ -175,7 +177,6 @@ function createPanel() {
     customContainer.appendChild(moveJointToLeftButton);
     customContainer.appendChild(moveJointToRightButton);
     gui.domElement.appendChild(customContainer);
-    
 
     if (folder2Title) {
         folder2Title.addEventListener('click', () => {
