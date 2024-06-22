@@ -169,7 +169,7 @@ function createPanel() {
         () => sendMoveJointToLeftMessage(0)
     );
     const moveJointToRightButton = createButton(
-        'Move Joint to Left',
+        'Move Joint to Right',
         () => sendMoveJointToRightMessage(1),
         () => sendMoveJointToRightMessage(0)
     );
