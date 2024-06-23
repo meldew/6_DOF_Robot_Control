@@ -1,7 +1,12 @@
 import asyncio
 import websockets
 import json
+import time
+import serial
+import serial.tools.list_ports
+
 print("Server is running...")
+ser = None
 J1 = 0
 J2 = 0
 J3 = 0
@@ -39,7 +44,19 @@ async def handle_client(websocket, path):
     connected_clients.add(websocket)
     print(f"Client connected: {websocket.remote_address}")
     
-    global J1, J2, J3, J4, J5, J6, J1direction, J2direction, J3direction, J4direction
+    global J1, J2, J3, J4, J5, J6, J1direction, J2direction, J3direction, J4direction, ser
+
+    if ser is None:
+        ports = serial.tools.list_ports.comports()
+        print(f"Available ports: {ports}")
+        for port in ports:
+            try:
+                ser = serial.Serial(port.device, 9600, timeout=1)
+                print(f"Serial port {port.device} opened successfully.")
+                break
+            except serial.SerialException as e:
+                print(f"Failed to open serial port {port.device}: {e}")
+
     while True:   
         try:
             try:
@@ -53,6 +70,11 @@ async def handle_client(websocket, path):
                 
                 messages.append(parsed_msg)
                 print(button_states)
+
+                if ser and ser.is_open:
+                    serial_data = json.dumps(button_states).encode('utf-8')
+                    ser.write(serial_data)
+                    print(f"Sent to serial: {serial_data}")
                     
             except asyncio.TimeoutError:
                 pass
@@ -64,4 +86,3 @@ async def handle_client(websocket, path):
 start_server = websockets.serve(handle_client, '127.0.0.1', 8765)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
-
