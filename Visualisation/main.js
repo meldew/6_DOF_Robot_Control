@@ -1,22 +1,20 @@
 console.log('main.js loaded');
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-import Stats from 'three/addons/libs/stats.module.js';
-import { xAxis, zAxis, yAxis } from './xAxis';
+import { xAxis, zAxis } from './xAxis';
+import { createPanel } from './createPanel';
+import { stats, render, scene, camera } from './stats';
 
 const socket = new WebSocket('ws://127.0.0.1:8765');
-const shoulder = new THREE.Object3D();
-const joint2 = new THREE.Object3D();
-const joint3 = new THREE.Object3D();
-const joint4 = new THREE.Object3D();
-const joint5 = new THREE.Object3D();
+export const shoulder = new THREE.Object3D();
+export const joint2 = new THREE.Object3D();
+export const joint3 = new THREE.Object3D();
+export const joint4 = new THREE.Object3D();
+export const joint5 = new THREE.Object3D();
 const buttonDelaytime = 200; 
-// tes
-let sendDataIntervalId = null;
+
+export let sendDataIntervalId = null;
 
 let J1 = 0;
 let J2 = 0;
@@ -25,7 +23,7 @@ let J4 = 0;
 let J5 = 0;
 let J6 = 0;
 
-var options = {
+export var options = {
     'Link1': 0,
     'Link2': 0,
     'Link3': 0,
@@ -59,7 +57,7 @@ var options = {
     }
 };
 
-function sendMoveJointToLeftMessage(value) {
+export function sendMoveJointToLeftMessage(value) {
     if (options.TransmitData) {
         const moveJointToLeftMessage = { type: 'MoveJointToLeft', value: value };
         socket.send(JSON.stringify(moveJointToLeftMessage));
@@ -68,7 +66,7 @@ function sendMoveJointToLeftMessage(value) {
     }
 }
 
-function sendMoveJointToRightMessage(value) {
+export function sendMoveJointToRightMessage(value) {
     if (options.TransmitData) {
         const moveJointToRightMessage = { type: 'MoveJointToRight', value: value };
         socket.send(JSON.stringify(moveJointToRightMessage));
@@ -77,172 +75,7 @@ function sendMoveJointToRightMessage(value) {
     }
 }
 
-// Stats
-const stats = new Stats();
-document.body.appendChild( stats.dom );
-
-// Scene and camera
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-// Render
-const render = new THREE.WebGLRenderer();
-render.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( render.domElement );
-
-//Camera position and axis helper
-camera.position.set( 0.7, 1, 0.8 );
-
-const grid = new THREE.GridHelper( 5, 50 );
-scene.add( grid );
-
-// Light
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.3 );
-directionalLight.position.set( 15, 10, 2 );
-scene.add( directionalLight );
-
-// Orbit controls and background color
-const orbit = new OrbitControls( camera, render.domElement )
-orbit.update();
-render.setClearColor(0xbfe3dd); 
-
-function createButton(name, onMouseDown, onMouseUp) {
-    const button = document.createElement('button');
-    button.innerHTML = name;
-    button.style.position = 'relative';
-    button.style.right = '-5px';
-    button.style.top = '-4px';
-    button.style.width = '96%';
-    button.style.marginTop = '4px';
-    button.addEventListener('mousedown', onMouseDown);
-    button.addEventListener('mouseup', onMouseUp);
-
-    return button;
-}
-
-// DAT.GUI Related Stuff
-function createPanel() {
-    const gui = new GUI();
-    const branch_Kinematics = gui.addFolder( 'Robot Forward Kinematics' );
-    const branch_Duplex_Com = gui.addFolder( 'Python Duplex Communication' );
-
-    Angles2Links(branch_Kinematics);
-    
-    branch_Duplex_Com.add(options, 'TransmitData').name('Send Data to Python').onChange(function(value) {
-        if (sendDataIntervalId !== null) {
-            clearInterval(sendDataIntervalId);
-            sendDataIntervalId = null;
-        }
-        if (value) {
-            sendDataIntervalId = setInterval(() => {
-                const testMessage = { type: 'Home', value: options.Link1 };
-                //socket.send(JSON.stringify(testMessage)); // Add data, peew peew peew 
-            }, 100);
-        } else {
-            if (sendDataIntervalId !== null) {
-                clearInterval(sendDataIntervalId);
-                sendDataIntervalId = null;
-            }
-        } 
-    });
-
-    branch_Duplex_Com.add(options, 'sendMoveToAngleRequest').name('Move to angle');
-    branch_Duplex_Com.add(options, 'sendHomeRequest').name('Home');
-    
-    const folder2Title = branch_Duplex_Com.domElement.querySelector('.title');
-    const gui2Title = gui.domElement.querySelector('.title');
-    const customContainer = document.createElement('div');
-
-    const moveJointToLeftButton = createButton(
-        'Move Joint to Left',
-        () => sendMoveJointToLeftMessage(1),
-        () => sendMoveJointToLeftMessage(0)
-    );
-    const moveJointToRightButton = createButton(
-        'Move Joint to Right',
-        () => sendMoveJointToRightMessage(1),
-        () => sendMoveJointToRightMessage(0)
-    );
-    
-    customContainer.appendChild(moveJointToLeftButton);
-    customContainer.appendChild(moveJointToRightButton);
-    branch_Duplex_Com.domElement.appendChild(customContainer);
-
-    if (folder2Title) {
-        folder2Title.addEventListener('click', () => {
-            const display1 = customContainer.style.display === 'none' ? 'block' : 'none';
-            customContainer.style.display = display1;
-        });
-    }
-}
-const loader = new GLTFLoader();
 createPanel();
-
-loader.load( 'assets/6DOF_gltf_files/base_link.gltf', function ( gltf ) {
-    const base = gltf.scene;
-    base.rotateOnAxis(xAxis, -Math.PI/2);
-    scene.add(base);
-    shoulder.translateZ(0.004);
-    base.add( shoulder ); 
-},  undefined, function ( error ) {console.error( error );});
-
-loader.load('assets/6DOF_gltf_files/link_1.gltf', function ( gltf ) {
-    const link1 = gltf.scene;
-    link1.rotateOnAxis(xAxis,  Math.PI);
-    shoulder.add( link1 );
-    link1.add( joint2 );
-},  undefined, function ( error ) {console.error( error );});
-
-loader.load('assets/6DOF_gltf_files/link_2.gltf', function ( gltf ) {
-    const link2 = gltf.scene;
-    scene.add(link2);
-    joint2.translateZ(-0.165);
-    joint2.translateY(0.065);
-    joint2.rotateOnAxis(zAxis,  Math.PI/2);
-    link2.rotateOnAxis(yAxis,  Math.PI/2);
-    link2.rotateOnAxis(xAxis,  Math.PI);
-    joint2.rotateOnAxis(xAxis,  Math.PI/2);
-    link2.rotateOnAxis(zAxis,  Math.PI/3);
-    joint2.add( link2 );
-    link2.add( joint3 );
-},  undefined, function ( error ) {console.error( error );});
-
-loader.load('assets/6DOF_gltf_files/link_3.gltf', function ( gltf ) {
-    const link3 = gltf.scene;  
-    scene.add(link3);
-    joint3.translateZ(0);
-    joint3.rotateOnAxis(zAxis,  Math.PI/2);
-    joint3.rotateOnAxis(zAxis,  Math.PI/6);
-    joint3.translateX(-0.305);
-    link3.rotateOnAxis(zAxis,  5*Math.PI/3);
-    joint3.add( link3 );
-    link3.add( joint4 );
-},  undefined, function ( error ) {console.error( error );});
-
-loader.load('assets/6DOF_gltf_files/link_4.gltf', function ( gltf ) {
-    const link4 = gltf.scene;
-    scene.add(link4);
-    link4.rotateOnAxis(yAxis,  3*Math.PI/2);
-    link4.rotateOnAxis(zAxis,  15.2*Math.PI/8);
-    joint4.add( link4 );
-    link4.add( joint5 );
-},  undefined, function ( error ) {console.error( error );});
-
-loader.load('assets/6DOF_gltf_files/link_5.gltf', function ( gltf ) {
-    const link5 = gltf.scene;
-    scene.add( link5 );
-    
-    joint5.translateZ(-0.222);
-    
-    const link5AxesHelper = new THREE.AxesHelper(0.2);
-    joint5.add(link5AxesHelper);
-    const link5AxesHelper1 = new THREE.AxesHelper(0.2);
-    link5.add(link5AxesHelper1);
-    joint5.add( link5 );
-    
-     
-},  undefined, function ( error ) {console.error( error );});
-
 socket.addEventListener('open', event => {
     console.log('Connected to WebSocket server');
     
@@ -270,7 +103,7 @@ socket.addEventListener('message', event => {
     }
 });
 
-function Angles2Links(branch_Kinematics) {
+export function Angles2Links(branch_Kinematics) {
     branch_Kinematics.add(options, 'Link1', -180, 180).listen();
     branch_Kinematics.add(options, 'Link2', -180, 180).listen();
     branch_Kinematics.add(options, 'Link3', -180, 180).listen();
