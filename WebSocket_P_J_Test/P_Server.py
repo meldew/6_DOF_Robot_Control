@@ -14,6 +14,8 @@ J3direction = 1
 J4direction = 1
 messages = []
 
+connected_clients = set()
+
 button_states = {
     "MoveToAngle": 0,
     "Home": 0,
@@ -34,6 +36,9 @@ def handle_move_joint_to_right(message):
     print("Handling MoveJointToRight message:", message)
 
 async def handle_client(websocket, path):
+    connected_clients.add(websocket)
+    print(f"Client connected: {websocket.remote_address}")
+    
     global J1, J2, J3, J4, J5, J6, J1direction, J2direction, J3direction, J4direction
     while True:   
         try:
