@@ -119,6 +119,14 @@ function createButton(name, onMouseDown, onMouseUp) {
     button.style.marginTop = '4px';
     button.addEventListener('mousedown', onMouseDown);
     button.addEventListener('mouseup', onMouseUp);
+    button.addEventListener('touchstart', (event) => {
+        event.preventDefault(); // Prevent default behavior such as scrolling
+        onMouseDown(event);
+    });
+    button.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        onMouseUp(event);
+    });
     return button;
 }
 
