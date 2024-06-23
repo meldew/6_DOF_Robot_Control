@@ -85,7 +85,6 @@ function createButton(name, onMouseDown, onMouseUp) {
     button.style.marginTop = '4px';
     button.addEventListener('mousedown', onMouseDown);
     button.addEventListener('mouseup', onMouseUp);
-
     return button;
 }
 
@@ -95,7 +94,13 @@ function createPanel() {
     const branch_Kinematics = gui.addFolder( 'Robot Forward Kinematics' );
     const branch_Duplex_Com = gui.addFolder( 'Python Duplex Communication' );
 
-    Angles2Links(branch_Kinematics);
+    branch_Kinematics.add(options, 'Link1', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link2', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link3', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link4', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link5', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link6', -180, 180).listen();
+    branch_Kinematics.open();
     
     branch_Duplex_Com.add(options, 'TransmitData').name('Send Data to Python').onChange(function(value) {
         if (sendDataIntervalId !== null) {
@@ -239,15 +244,6 @@ socket.addEventListener('message', event => {
     }
 });
 
-function Angles2Links(branch_Kinematics) {
-    branch_Kinematics.add(options, 'Link1', -180, 180).listen();
-    branch_Kinematics.add(options, 'Link2', -180, 180).listen();
-    branch_Kinematics.add(options, 'Link3', -180, 180).listen();
-    branch_Kinematics.add(options, 'Link4', -180, 180).listen();
-    branch_Kinematics.add(options, 'Link5', -180, 180).listen();
-    branch_Kinematics.add(options, 'Link6', -180, 180).listen();
-    branch_Kinematics.open();
-}
 
 function animate() {  
     stats.update();
