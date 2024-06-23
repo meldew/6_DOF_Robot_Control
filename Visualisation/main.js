@@ -1,12 +1,11 @@
 console.log('main.js loaded');
 import * as THREE from 'three';
 import WebGL from 'three/addons/capabilities/WebGL.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-import Stats from 'three/addons/libs/stats.module.js';
 import { xAxis, zAxis, yAxis } from './xAxis';
+import { scene, stats, render, camera } from './scene';
 
 const socket = new WebSocket('ws://127.0.0.1:8765');
 const shoulder = new THREE.Object3D();
@@ -76,36 +75,6 @@ function sendMoveJointToRightMessage(value) {
         console.log("TransmitData is disabled, not sending move joint to left request");
     }
 }
-
-// Stats
-const stats = new Stats();
-document.body.appendChild( stats.dom );
-
-// Scene and camera
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-// Render
-const render = new THREE.WebGLRenderer();
-render.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( render.domElement );
-
-//Camera position and axis helper
-camera.position.set( 0.7, 1, 0.8 );
-
-const grid = new THREE.GridHelper( 5, 50 );
-scene.add( grid );
-
-// Light
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.3 );
-directionalLight.position.set( 15, 10, 2 );
-scene.add( directionalLight );
-
-// Orbit controls and background color
-const orbit = new OrbitControls( camera, render.domElement )
-orbit.update();
-render.setClearColor(0xbfe3dd); 
-
 function createButton(name, onMouseDown, onMouseUp) {
     const button = document.createElement('button');
     button.innerHTML = name;
