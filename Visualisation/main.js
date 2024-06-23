@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import Stats from 'three/addons/libs/stats.module.js';
+import { xAxis, zAxis, yAxis } from './xAxis';
 
 const socket = new WebSocket('ws://127.0.0.1:8765');
 const shoulder = new THREE.Object3D();
@@ -14,11 +15,7 @@ const joint3 = new THREE.Object3D();
 const joint4 = new THREE.Object3D();
 const joint5 = new THREE.Object3D();
 const buttonDelaytime = 200; 
-
-var zAxis = new THREE.Vector3(0, 0, 1);
-var yAxis = new THREE.Vector3(0, 1, 0);
-var xAxis = new THREE.Vector3(1, 0, 0);
-
+// tes
 let sendDataIntervalId = null;
 
 let J1 = 0;
@@ -126,18 +123,12 @@ function createButton(name, onMouseDown, onMouseUp) {
 // DAT.GUI Related Stuff
 function createPanel() {
     const gui = new GUI();
-    const folder1 = gui.addFolder( 'Robot Forward Kinematics' );
-    const folder2 = gui.addFolder( 'Python Duplex Communication' );
+    const branch_Kinematics = gui.addFolder( 'Robot Forward Kinematics' );
+    const branch_Duplex_Com = gui.addFolder( 'Python Duplex Communication' );
 
-    folder1.add(options, 'Link1', -180, 180).listen();
-    folder1.add(options, 'Link2', -180, 180).listen();
-    folder1.add(options, 'Link3', -180, 180).listen();
-    folder1.add(options, 'Link4', -180, 180).listen();
-    folder1.add(options, 'Link5', -180, 180).listen();
-    folder1.add(options, 'Link6', -180, 180).listen();
-    folder1.open();
+    Angles2Links(branch_Kinematics);
     
-    folder2.add(options, 'TransmitData').name('Send Data to Python').onChange(function(value) {
+    branch_Duplex_Com.add(options, 'TransmitData').name('Send Data to Python').onChange(function(value) {
         if (sendDataIntervalId !== null) {
             clearInterval(sendDataIntervalId);
             sendDataIntervalId = null;
@@ -155,10 +146,10 @@ function createPanel() {
         } 
     });
 
-    folder2.add(options, 'sendMoveToAngleRequest').name('Move to angle');
-    folder2.add(options, 'sendHomeRequest').name('Home');
+    branch_Duplex_Com.add(options, 'sendMoveToAngleRequest').name('Move to angle');
+    branch_Duplex_Com.add(options, 'sendHomeRequest').name('Home');
     
-    const folder2Title = folder2.domElement.querySelector('.title');
+    const folder2Title = branch_Duplex_Com.domElement.querySelector('.title');
     const gui2Title = gui.domElement.querySelector('.title');
     const customContainer = document.createElement('div');
 
@@ -175,7 +166,7 @@ function createPanel() {
     
     customContainer.appendChild(moveJointToLeftButton);
     customContainer.appendChild(moveJointToRightButton);
-    gui.domElement.appendChild(customContainer);
+    branch_Duplex_Com.domElement.appendChild(customContainer);
 
     if (folder2Title) {
         folder2Title.addEventListener('click', () => {
@@ -270,14 +261,24 @@ socket.addEventListener('message', event => {
         J2 = values.J2;
         J3 = values.J3;
         J4 = values.J4;
-        //console.log('J1: ', J1);
-        //console.log('J2: ', J2);
+        console.log('J1: ', J1);
+        console.log('J2: ', J2);
         //console.log('J3: ', J3);
         //console.log('J4: ', J4);
     } catch (error) {
         console.error('Error processing message:', error);
     }
 });
+
+function Angles2Links(branch_Kinematics) {
+    branch_Kinematics.add(options, 'Link1', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link2', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link3', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link4', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link5', -180, 180).listen();
+    branch_Kinematics.add(options, 'Link6', -180, 180).listen();
+    branch_Kinematics.open();
+}
 
 function animate() {  
     stats.update();

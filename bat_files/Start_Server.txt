@@ -1,0 +1,10 @@
+@echo off
+
+echo Starting Python server...
+start cmd /k "cd \Users\melde\OneDrive\Skrivebord\Alt\Projects\6DOF_control\6_DOF_Robot_Control\WebSocket_P_J_Test && python P_Server.py"
+
+echo Starting Vite project… 
+start cmd /k "cd \Users\melde\OneDrive\Skrivebord\Alt\Projects\6DOF_control\6_DOF_Robot_Control\Visualisation && npx vite"
+
+pause
+
