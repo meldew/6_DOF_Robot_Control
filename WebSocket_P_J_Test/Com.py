@@ -1,35 +1,28 @@
-import serial.tools.list_ports
+import serial
+import time
 
-def get_ports():
+arduino_port = 'COM3'  # Update this to your correct COM port
+baud_rate = 115000
 
-    ports = serial.tools.list_ports.comports()
-    
-    return ports
+# Initialize the serial connection
+arduino = serial.Serial(arduino_port, baud_rate, timeout=1)
+time.sleep(2)  # Allow time for Arduino to initialize
 
-def findArduino(portsFound):
-    
-    commPort = 'None'
-    numConnection = len(portsFound)
-    
-    for i in range(0,numConnection):
-        port = foundPorts[i]
-        strPort = str(port)
-        
-        if 'Arduino' in strPort: 
-            splitPort = strPort.split(' ')
-            commPort = (splitPort[0])
+try:
+    while True:
+        # Send data to Arduino
+        message = 'Hello, Arduino!'
+        arduino.write((message + '\n').encode())  # Append newline character
+        print(f"Sent: {message}")
 
-    return commPort
-            
-                    
-foundPorts = get_ports()        
-connectPort = findArduino(foundPorts)
+        # Read response from Arduino
+        response = arduino.readline().decode().strip()
+        if response:
+            print(f"Received: {response}")
 
-if connectPort != 'None':
-    ser = serial.Serial(connectPort,baudrate = 9600, timeout=1)
-    print('Connected to ' + connectPort)
-
-else:
-    print('Connection Issue!')
-
-print('DONE')
+        time.sleep(1)  # Adjust the sleep time as needed
+except KeyboardInterrupt:
+    print("Interrupted by user. Closing the connection.")
+finally:
+    arduino.close()
+    print("Connection closed.")

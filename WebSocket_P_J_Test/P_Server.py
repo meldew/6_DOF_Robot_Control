@@ -51,7 +51,7 @@ async def handle_client(websocket, path):
         print(f"Available ports: {ports}")
         for port in ports:
             try:
-                ser = serial.Serial(port.device, 9600, timeout=1)
+                ser = serial.Serial(port.device, 115000, timeout=1)
                 print(f"Serial port {port.device} opened successfully.")
                 break
             except serial.SerialException as e:
@@ -74,7 +74,9 @@ async def handle_client(websocket, path):
                 if ser and ser.is_open:
                     serial_data = json.dumps(button_states).encode('utf-8')
                     ser.write(serial_data)
-                    print(f"Sent to serial: {serial_data}")
+                    #print(f"Sent to serial: {serial_data}")
+                    print(ser.readline().decode('utf-8', errors='ignore').strip())
+                    #print(ser.readline().decode('utf-8', errors='ignore').strip())
                     
             except asyncio.TimeoutError:
                 pass

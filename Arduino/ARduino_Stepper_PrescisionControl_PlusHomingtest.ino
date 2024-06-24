@@ -1,3 +1,5 @@
+#include <ArduinoJson.h>
+
 const int stepPin = 4;
 const int dirPin = 3;
 const int limitSwitchPin = 2;
@@ -12,9 +14,15 @@ const int motorSpeed = 400;
 bool homingComplete = false;
 long currentPosition = 0;
 bool HomingRequest = HIGH;
-float targetAngle = false; 
+float targetAngle = 90; 
 String inputString = "";
 bool stringComplete = false;
+
+const int logSize = 1000;
+bool homeLog[logSize];
+int logIndex = 0;
+int homeChangeCounter = 0; // Counter to track the number of changes
+bool lastHomeValue = false;
 
 void setup() {
   pinMode(stepPin, OUTPUT);
@@ -24,25 +32,49 @@ void setup() {
   pinMode(homeSwitchPin, INPUT_PULLUP);
   pinMode(moveTOButtonPin, INPUT_PULLUP);
   pinMode(resetHomingButtonPin, INPUT_PULLUP);
-  Serial.begin(9600);
+  Serial.begin(115000);
+  //Serial.println("Arduino setup is done!");
 }
 
 void loop() {
-
   if (digitalRead(resetHomingButtonPin) == LOW) {
     while(digitalRead(resetHomingButtonPin) == LOW); 
     homingComplete = false;
     HomingRequest = HIGH;
   }
+  
+  String receivedData = Serial.readStringUntil('\n');
+  const size_t capacity = JSON_OBJECT_SIZE(4) + 80;
+  DynamicJsonDocument doc(capacity);
+  DeserializationError error = deserializeJson(doc, receivedData);
+  bool MoveToAngle = doc["MoveToAngle"];
+  bool home = doc["Home"];
+  bool moveJointToLeft = doc["MoveJointToLeft"];
+  bool moveJointToRight = doc["MoveJointToRight"];
+
+  homeLog[logIndex] = home;
+  logIndex = (logIndex + 1) % logSize; // Circular buffer
+
+  if (home != lastHomeValue) {
+      homeLog[logIndex] = home;
+      logIndex = (logIndex + 1) % logSize; // Circular buffer
+      homeChangeCounter++;
+      lastHomeValue = home;
+
+      // Check if the 'home' variable has changed 5 times
+      if (homeChangeCounter >= 5) {
+        homeChangeCounter = 0; // Reset the counter after logging
+      }
+    }
 
   if (stringComplete) {
     targetAngle = inputString.toFloat(); 
-    Serial.print("Target Angle Set To: ");
-    Serial.println(targetAngle);
+    //Serial.print("Target Angle Set To: ");
+    //Serial.println(targetAngle);
     inputString = ""; 
     stringComplete = false;
-  }
-
+  } 
+    
   if(HomingRequest == HIGH && homingComplete == false){
     performHoming();
   }
@@ -54,8 +86,8 @@ void loop() {
       moveMotor(stepsFor1Degree, LOW);
     }
     float currentAngle = calculateCurrentAngle();
-    Serial.print("Current Angle: ");
-    Serial.println(currentAngle, 2);
+    //Serial.print("Current Angle: ");
+    //Serial.println(currentAngle, 2);
   }
 }
 
@@ -72,7 +104,7 @@ void serialEvent() {
 void moveToAngle (float angle){
   long stepsTo_TargetPosition = angle * stepsPerRevolution / 360.0;
   long stepsToMove = stepsTo_TargetPosition - currentPosition;
-  Serial.println(stepsTo_TargetPosition);
+  //Serial.println(stepsTo_TargetPosition);
   if (stepsToMove == 0) return; 
   bool direction = stepsToMove > 0;
   moveMotor(abs(stepsToMove), direction);
@@ -86,7 +118,7 @@ void performHoming() {
   }
   currentPosition = 0;
   homingComplete = true;
-  Serial.println("Homing Complete. Current Position Reset.");
+  //Serial.println("Homing Complete. Current Position Reset.");
 }
 
 void moveMotor(int steps, bool direction) {
