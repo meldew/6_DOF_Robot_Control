@@ -1,28 +1,29 @@
 import serial
 import time
 
-arduino_port = 'COM3'  # Update this to your correct COM port
-baud_rate = 115000
+# Configure the serial port and baud rate to match the Arduino
+arduino = serial.Serial('COM3', 9600, timeout=1) # Change 'COM3' to the appropriate port for your system
 
-# Initialize the serial connection
-arduino = serial.Serial(arduino_port, baud_rate, timeout=1)
-time.sleep(2)  # Allow time for Arduino to initialize
+time.sleep(2) # Wait for the serial connection to initialize
+
+def send_data(data):
+    arduino.write(data.encode()) # Send data to Arduino
+    arduino.write(b'\n') # Send a newline character to indicate the end of data
+
+def receive_data():
+    data = arduino.readline().decode().strip() # Read data from Arduino
+    return data
 
 try:
     while True:
-        # Send data to Arduino
-        message = 'Hello, Arduino!'
-        arduino.write((message + '\n').encode())  # Append newline character
-        print(f"Sent: {message}")
+        send_data("Hello from Python!") # Send data to Arduino
+        #time.sleep(1) # Wait for a second
+        received = receive_data() # Receive data from Arduino
+        if received:
+            print(received) # Print the received data
 
-        # Read response from Arduino
-        response = arduino.readline().decode().strip()
-        if response:
-            print(f"Received: {response}")
-
-        time.sleep(1)  # Adjust the sleep time as needed
 except KeyboardInterrupt:
-    print("Interrupted by user. Closing the connection.")
+    print("Program terminated")
+
 finally:
-    arduino.close()
-    print("Connection closed.")
+    arduino.close() # Close the serial connection

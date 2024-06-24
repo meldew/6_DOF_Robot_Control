@@ -13,7 +13,7 @@ const joint2 = new THREE.Object3D();
 const joint3 = new THREE.Object3D();
 const joint4 = new THREE.Object3D();
 const joint5 = new THREE.Object3D();
-const buttonDelaytime = 200; 
+const buttonDelaytime = 300; 
 
 var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
@@ -151,9 +151,9 @@ function createPanel() {
         }
         if (value) {
             sendDataIntervalId = setInterval(() => {
-                const testMessage = { type: 'Home', value: options.Link1 };
-                //socket.send(JSON.stringify(testMessage)); // Add data, peew peew peew 
-            }, 100);
+                const fillerMessage = {};
+                socket.send(JSON.stringify(fillerMessage)); // FIller to get data rolling
+            }, 50);
         } else {
             if (sendDataIntervalId !== null) {
                 clearInterval(sendDataIntervalId);
