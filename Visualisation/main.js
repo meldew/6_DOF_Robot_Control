@@ -13,7 +13,7 @@ const joint2 = new THREE.Object3D();
 const joint3 = new THREE.Object3D();
 const joint4 = new THREE.Object3D();
 const joint5 = new THREE.Object3D();
-const buttonDelaytime = 300; 
+const buttonDelaytime = 50; 
 
 var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);

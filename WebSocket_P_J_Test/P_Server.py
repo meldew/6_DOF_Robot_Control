@@ -41,7 +41,7 @@ def handle_move_joint_to_right(message):
 
 
 arduino = serial.Serial('COM3', 115200, timeout=1)
-time.sleep(2)
+time.sleep(3)
 
 async def handle_client(websocket, path):
     connected_clients.add(websocket)
