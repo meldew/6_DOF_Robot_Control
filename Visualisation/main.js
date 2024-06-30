@@ -278,7 +278,7 @@ socket.addEventListener('message', event => {
         J3 = values.J3;
         J4 = values.J4;
         console.log('J1: ', J1);
-        console.log('J2: ', J2);
+        
         //console.log('J3: ', J3);
         //console.log('J4: ', J4);
     } catch (error) {
@@ -289,19 +289,19 @@ socket.addEventListener('message', event => {
 
 function animate() {  
     stats.update();
-
+    /*
     shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
     joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
     joint5.setRotationFromAxisAngle(xAxis, options.Link5 * Math.PI/180);
+    */
     
-    /*
     shoulder.setRotationFromAxisAngle(zAxis, J1 * Math.PI/180);
     joint2.setRotationFromAxisAngle(xAxis, J2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, J3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, J4 * Math.PI/180);
-    */
+    
 	render.render( scene, camera );
 }   
 

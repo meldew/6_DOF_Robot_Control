@@ -2,11 +2,12 @@
 
 const int stepPin = 4;
 const int dirPin = 3;
-bool moveManuallyMotorToLeft = false; 
-bool moveManuallyMotorToRight = false; 
 const int homeSwitchPin = 6;
 const int moveTOButtonPin = 7; 
 const int resetHomingButtonPin = 8;
+
+bool moveManuallyMotorToLeft = false; 
+bool moveManuallyMotorToRight = false; 
 bool resetHome = false;
 bool MoveToAngle = false;
 
@@ -66,7 +67,7 @@ void loop() {
     }
     if (homingComplete) {
       float currentAngle = calculateCurrentAngle();
-      Serial.print("Current Angle: ");
+      Serial.print("J1 Angle:");
       Serial.println(currentAngle, 2);
     }
   }  

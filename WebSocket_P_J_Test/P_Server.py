@@ -27,18 +27,16 @@ button_states = {
     "MoveJointToRight": 0
 }
 
-def handle_move_to_angle(message):
-    print("Handling MoveToAngle message:", message)
-
-def handle_home(message):
-    print("Handling Home message:", message)
-
-def handle_move_joint_to_left(message):
-    print("Handling MoveJointToLeft message:", message)
-
-def handle_move_joint_to_right(message):
-    print("Handling MoveJointToRight message:", message)
-
+async def read_arduino():
+    global J1, J2, J3, J4, J5, J6
+    while True:
+        data = arduino.readline().decode().strip()
+        if data:
+            print(f"Received from Arduino: {data}")
+            if data.startswith("J1 Angle:"):
+                J1 = float(data.split(":")[1])
+            # Add similar parsing for J2, J3, J4, J5, J6 if needed
+        await asyncio.sleep(0.1)
 
 arduino = serial.Serial('COM3', 115200, timeout=1)
 time.sleep(3)
@@ -62,11 +60,26 @@ async def handle_client(websocket, path):
                 
                 json_data = json.dumps(button_states) + '\n'
                 arduino.write(json_data.encode('utf-8'))
+                
+                
 
                 data = arduino.readline().decode().strip()
                 if data: 
-                    print(data)
-          
+                    print(f"Received from Arduino: {data}")
+                    if data.startswith("J1 Angle:"):
+                        J1 = float(data.split(":")[1])
+                
+                values = {
+                    'J1': J1,
+                    'J2': J2,
+                    'J3': J3,
+                    'J4': J4,
+                    'J5': J5,
+                    'J6': J6
+                }
+                values_json = json.dumps(values) 
+                await websocket.send(values_json) 
+                        
             except asyncio.TimeoutError:
                 continue  
         
