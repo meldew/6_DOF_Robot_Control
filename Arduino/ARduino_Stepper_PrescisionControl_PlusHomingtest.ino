@@ -17,8 +17,10 @@ const int motorSpeed = 200;
 bool homingComplete = false;
 long currentPosition = 0;
 bool HomingRequest = HIGH;
-float targetAngle = 90; 
+float targetAngle = 0; 
 bool stringComplete = false;
+float maxJ1Angle = 120.0;
+float minJ1Angle = -120.0;
 
 // State variables for non-blocking motor control
 bool motorMoving = false;
@@ -35,44 +37,7 @@ void setup() {
 }
 
 void loop() {
-  // Check for serial input continuously
-  if (Serial.available() > 0) {
-    String data = Serial.readStringUntil('\n');
-
-    const size_t capacity = JSON_OBJECT_SIZE(4) + 40;
-    DynamicJsonDocument doc(capacity);
-    DeserializationError error = deserializeJson(doc, data);
-    resetHome = doc["Home"];
-    moveManuallyMotorToLeft = doc["MoveJointToLeft"];
-    moveManuallyMotorToRight = doc["MoveJointToRight"];
-    MoveToAngle = doc["MoveToAngle"];
-
-    if (resetHome) { 
-      homingComplete = false;
-      HomingRequest = HIGH;
-    }
-
-    if (HomingRequest == HIGH && homingComplete == false) {
-      performHoming();
-    }
-
-    if (homingComplete) {
-      if (moveManuallyMotorToLeft) {
-        moveMotorNonBlocking(stepsFor1Degree, LOW);
-      } else if (moveManuallyMotorToRight) {
-        moveMotorNonBlocking(stepsFor1Degree, HIGH);
-      } else if (MoveToAngle) {
-        moveToAngle(targetAngle);
-      }
-    }
-    if (homingComplete) {
-      float currentAngle = calculateCurrentAngle();
-      Serial.print("J1 Angle:");
-      Serial.println(currentAngle, 2);
-    }
-  }  
-
-  moveMotorUpdate();
+  J1_NormalOperation();
 }
 
 void moveMotorNonBlocking(int steps, bool direction) {
@@ -112,7 +77,7 @@ void performHoming() {
     takeStep();
     currentPosition--;
   }
-  currentPosition = 0;
+  currentPosition = 120 * stepsPerRevolution / 360;
   homingComplete = true;
 }
 
@@ -125,4 +90,50 @@ void takeStep() {
 
 float calculateCurrentAngle() {
   return static_cast<float>(currentPosition) * 360.0 / stepsPerRevolution;
+}
+
+void J1_NormalOperation() {
+  if (Serial.available() > 0) {
+      String data = Serial.readStringUntil('\n');
+
+      const size_t capacity = JSON_OBJECT_SIZE(4) + 40;
+      DynamicJsonDocument doc(capacity);
+      DeserializationError error = deserializeJson(doc, data);
+      resetHome = doc["Home"];
+      moveManuallyMotorToLeft = doc["MoveJointToLeft"];
+      moveManuallyMotorToRight = doc["MoveJointToRight"];
+      MoveToAngle = doc["MoveToAngle"];
+
+      if (resetHome) { 
+        homingComplete = false;
+        HomingRequest = HIGH;
+      }
+
+      if (HomingRequest == HIGH && homingComplete == false) {
+        performHoming();
+      }
+
+      if (homingComplete) {
+        float currentAngle = calculateCurrentAngle();
+        Serial.print("J1 Angle:");
+        Serial.println(currentAngle, 2);
+
+        if (moveManuallyMotorToLeft && currentAngle < maxJ1Angle) {
+          moveMotorNonBlocking(stepsFor1Degree, HIGH);
+        } else if (moveManuallyMotorToRight && currentAngle > minJ1Angle) {
+          moveMotorNonBlocking(stepsFor1Degree, LOW);
+        } else if (MoveToAngle) {
+          moveToAngle(targetAngle);
+        }
+      }
+    } else {
+      
+    }
+    moveMotorUpdate();
+}
+
+bool checkForError(bool error){
+  if (!Serial.available() > 0 || error == true) {
+    return true;
+  }
 }
