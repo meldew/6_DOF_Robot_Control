@@ -113,9 +113,9 @@ function createButton(name, onMouseDown, onMouseUp) {
     const button = document.createElement('button');
     button.innerHTML = name;
     button.style.position = 'relative';
-    button.style.right = '-5px';
+    button.style.right = '-13px';
     button.style.top = '-4px';
-    button.style.width = '96%';
+    button.style.width = '93%';
     button.style.marginTop = '4px';
     button.addEventListener('mousedown', onMouseDown);
     button.addEventListener('mouseup', onMouseUp);
@@ -135,6 +135,7 @@ function createPanel() {
     const gui = new GUI();
     const branch_Kinematics = gui.addFolder( 'Robot Forward Kinematics' );
     const branch_Duplex_Com = gui.addFolder( 'Python Duplex Communication' );
+    const duplex_folder = branch_Duplex_Com.addFolder('J1');
 
     branch_Kinematics.add(options, 'Link1', -180, 180).listen();
     branch_Kinematics.add(options, 'Link2', -180, 180).listen();
@@ -162,10 +163,10 @@ function createPanel() {
         } 
     });
 
-    branch_Duplex_Com.add(options, 'sendMoveToAngleRequest').name('Move to angle');
-    branch_Duplex_Com.add(options, 'sendHomeRequest').name('Home');
+    duplex_folder.add(options, 'sendMoveToAngleRequest').name('Home');
+    duplex_folder.add(options, 'sendHomeRequest').name('Calibrate');
     
-    const folder2Title = branch_Duplex_Com.domElement.querySelector('.title');
+    const folder2Title = duplex_folder.domElement.querySelector('.title');
     const gui2Title = gui.domElement.querySelector('.title');
     const customContainer = document.createElement('div');
 
@@ -182,7 +183,7 @@ function createPanel() {
     
     customContainer.appendChild(moveJointToLeftButton);
     customContainer.appendChild(moveJointToRightButton);
-    branch_Duplex_Com.domElement.appendChild(customContainer);
+    duplex_folder.domElement.appendChild(customContainer);
 
     if (folder2Title) {
         folder2Title.addEventListener('click', () => {
