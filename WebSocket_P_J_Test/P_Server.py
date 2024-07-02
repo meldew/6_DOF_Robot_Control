@@ -27,7 +27,6 @@ button_states = {
     "MoveJointToRight": 0
 }
 
-
 arduino = serial.Serial('COM3', 115200, timeout=1)
 time.sleep(3)
 
