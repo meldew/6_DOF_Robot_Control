@@ -27,16 +27,6 @@ button_states = {
     "MoveJointToRight": 0
 }
 
-async def read_arduino():
-    global J1, J2, J3, J4, J5, J6
-    while True:
-        data = arduino.readline().decode().strip()
-        if data:
-            print(f"Received from Arduino: {data}")
-            if data.startswith("J1 Angle:"):
-                J1 = float(data.split(":")[1])
-            # Add similar parsing for J2, J3, J4, J5, J6 if needed
-        await asyncio.sleep(0.1)
 
 arduino = serial.Serial('COM3', 115200, timeout=1)
 time.sleep(3)

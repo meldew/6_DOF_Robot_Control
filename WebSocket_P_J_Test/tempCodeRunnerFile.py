@@ -1,1 +1,0 @@
-time.sleep(2)  # Wait for the serial connection to initialize
