@@ -2,7 +2,6 @@
 
 const int stepPin = 2;
 const int dirPin = 3;
-
 const int homeSwitchPin = 6;
 
 bool moveManuallyMotorToLeft = false; 
