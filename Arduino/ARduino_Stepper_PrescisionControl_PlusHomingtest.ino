@@ -1,10 +1,9 @@
 #include <ArduinoJson.h>
 
-const int stepPin = 4;
+const int stepPin = 2;
 const int dirPin = 3;
+
 const int homeSwitchPin = 6;
-const int moveTOButtonPin = 7; 
-const int resetHomingButtonPin = 8;
 
 bool moveManuallyMotorToLeft = false; 
 bool moveManuallyMotorToRight = false; 
