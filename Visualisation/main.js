@@ -13,7 +13,7 @@ const joint2 = new THREE.Object3D();
 const joint3 = new THREE.Object3D();
 const joint4 = new THREE.Object3D();
 const joint5 = new THREE.Object3D();
-const buttonDelaytime = 200; 
+const buttonDelaytime = 50; 
 
 var zAxis = new THREE.Vector3(0, 0, 1);
 var yAxis = new THREE.Vector3(0, 1, 0);
@@ -113,9 +113,9 @@ function createButton(name, onMouseDown, onMouseUp) {
     const button = document.createElement('button');
     button.innerHTML = name;
     button.style.position = 'relative';
-    button.style.right = '-5px';
+    button.style.right = '-13px';
     button.style.top = '-4px';
-    button.style.width = '96%';
+    button.style.width = '93%';
     button.style.marginTop = '4px';
     button.addEventListener('mousedown', onMouseDown);
     button.addEventListener('mouseup', onMouseUp);
@@ -135,6 +135,7 @@ function createPanel() {
     const gui = new GUI();
     const branch_Kinematics = gui.addFolder( 'Robot Forward Kinematics' );
     const branch_Duplex_Com = gui.addFolder( 'Python Duplex Communication' );
+    const duplex_folder = branch_Duplex_Com.addFolder('J1');
 
     branch_Kinematics.add(options, 'Link1', -180, 180).listen();
     branch_Kinematics.add(options, 'Link2', -180, 180).listen();
@@ -151,9 +152,9 @@ function createPanel() {
         }
         if (value) {
             sendDataIntervalId = setInterval(() => {
-                const testMessage = { type: 'Home', value: options.Link1 };
-                //socket.send(JSON.stringify(testMessage)); // Add data, peew peew peew 
-            }, 100);
+                const fillerMessage = {};
+                socket.send(JSON.stringify(fillerMessage)); // FIller to get data rolling
+            }, 50);
         } else {
             if (sendDataIntervalId !== null) {
                 clearInterval(sendDataIntervalId);
@@ -162,10 +163,10 @@ function createPanel() {
         } 
     });
 
-    branch_Duplex_Com.add(options, 'sendMoveToAngleRequest').name('Move to angle');
-    branch_Duplex_Com.add(options, 'sendHomeRequest').name('Home');
+    duplex_folder.add(options, 'sendMoveToAngleRequest').name('Home');
+    duplex_folder.add(options, 'sendHomeRequest').name('Calibrate');
     
-    const folder2Title = branch_Duplex_Com.domElement.querySelector('.title');
+    const folder2Title = duplex_folder.domElement.querySelector('.title');
     const gui2Title = gui.domElement.querySelector('.title');
     const customContainer = document.createElement('div');
 
@@ -182,7 +183,7 @@ function createPanel() {
     
     customContainer.appendChild(moveJointToLeftButton);
     customContainer.appendChild(moveJointToRightButton);
-    branch_Duplex_Com.domElement.appendChild(customContainer);
+    duplex_folder.domElement.appendChild(customContainer);
 
     if (folder2Title) {
         folder2Title.addEventListener('click', () => {
@@ -278,7 +279,7 @@ socket.addEventListener('message', event => {
         J3 = values.J3;
         J4 = values.J4;
         console.log('J1: ', J1);
-        console.log('J2: ', J2);
+        
         //console.log('J3: ', J3);
         //console.log('J4: ', J4);
     } catch (error) {
@@ -289,19 +290,19 @@ socket.addEventListener('message', event => {
 
 function animate() {  
     stats.update();
-
+    /*
     shoulder.setRotationFromAxisAngle(zAxis, options.Link1 * Math.PI/180);
     joint2.setRotationFromAxisAngle(xAxis, options.Link2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, options.Link3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, options.Link4 * Math.PI/180);
     joint5.setRotationFromAxisAngle(xAxis, options.Link5 * Math.PI/180);
+    */
     
-    /*
     shoulder.setRotationFromAxisAngle(zAxis, J1 * Math.PI/180);
     joint2.setRotationFromAxisAngle(xAxis, J2 * Math.PI/180);
     joint3.setRotationFromAxisAngle(zAxis, J3 * Math.PI/180);
     joint4.setRotationFromAxisAngle(xAxis, J4 * Math.PI/180);
-    */
+    
 	render.render( scene, camera );
 }   
 
