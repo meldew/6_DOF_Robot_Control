@@ -14,7 +14,7 @@ bool MoveToAngle = false;
 
 const long stepsPerRevolution = J1stepsPerRevolution;
 const long stepsFor1Degree = (stepsPerRevolution / 360);
-const int motorSpeed = 200;
+const int motorSpeed = 600;
 bool homingComplete = false;
 long currentPosition = 0;
 bool HomingRequest = HIGH;
@@ -30,6 +30,9 @@ long motorStepsRemaining = 0;
 bool motorDirection = LOW;
 unsigned long motorLastStepTime = 0;
 
+unsigned long lastTxMs = 0;
+const uint16_t TX_INTERVAL_MS = 100;
+
 void setup() {
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
@@ -39,6 +42,14 @@ void setup() {
 
 void loop() {
   J1_NormalOperation();
+}
+
+inline void maybeSendAngle() {
+  unsigned long now = millis();
+  if (now - lastTxMs >= TX_INTERVAL_MS) {
+    Serial.println(calculateCurrentAngle(), 2);  // angle only
+    lastTxMs = now;
+  }
 }
 
 inline bool homePressed() {                 // INPUT_PULLUP: pressed = LOW
@@ -123,6 +134,7 @@ void performHoming() {
   long walked = 0;
   while (!pressed()) {
     pulse(HOMING_DIR);
+    maybeSendAngle();
     if (++walked >= MAX_STEPS) { homingComplete = false; return; }
   }
 
@@ -137,11 +149,11 @@ void performHoming() {
   }
 
   // 3) Back off until released, then add margin
-  while (pressed()) { pulse(!HOMING_DIR); }
+  while (pressed()) { pulse(!HOMING_DIR); maybeSendAngle(); }
   for (int i=0; i<RELEASE_MARGIN_STEPS; ++i) pulse(!HOMING_DIR);
 
   // 4) Re-approach slowly to press again (clean edge)
-  while (!pressed()) { pulse(HOMING_DIR); }
+  while (!pressed()) { pulse(HOMING_DIR); maybeSendAngle(); }
 
   // 5) Final tiny clearance and set reference
   for (int i=0; i<CLEARANCE_STEPS; ++i) pulse(!HOMING_DIR);
@@ -150,9 +162,6 @@ void performHoming() {
   currentPosition = (long)(-120.0 * stepsPerRevolution / 360.0);
   homingComplete = true;
 }
-
-
-
 
 void takeStep() {
   digitalWrite(stepPin, HIGH);
