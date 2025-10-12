@@ -27,7 +27,7 @@ button_states = {
     "MoveJointToRight": 0
 }
 
-arduino = serial.Serial('COM3', 115200, timeout=1)
+arduino = serial.Serial('COM6', 115200, timeout=1)
 time.sleep(3)
 
 async def handle_client(websocket, path):
@@ -43,6 +43,7 @@ async def handle_client(websocket, path):
                 parsed_msg = json.loads(incoming_msg)
                 message_type = parsed_msg.get('type')
                 value = parsed_msg.get('value') 
+                print(f"Received from JS: {parsed_msg}")
 
                 if message_type in button_states:
                     button_states[message_type] = value
