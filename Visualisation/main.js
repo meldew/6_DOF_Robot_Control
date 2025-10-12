@@ -169,6 +169,14 @@ function createPanel() {
     const folder2Title = duplex_folder.domElement.querySelector('.title');
     const gui2Title = gui.domElement.querySelector('.title');
     const customContainer = document.createElement('div');
+    
+    customContainer.style.display = 'flex';
+    customContainer.style.justifyContent = 'space-between';
+    customContainer.style.gap = '3px';
+    customContainer.style.width = 'calc(100% - 17px)';
+    customContainer.style.marginLeft = '0px';
+    customContainer.style.marginTop = '3px';
+
 
     const moveJointToLeftButton = createButton(
         'Move Joint to Left',
@@ -181,13 +189,20 @@ function createPanel() {
         () => sendMoveJointToRightMessage(0)
     );
     
+
+    moveJointToLeftButton.style.flex = '1';
+    moveJointToRightButton.style.flex = '1';
+    moveJointToLeftButton.style.boxSizing = 'border-box';
+    moveJointToRightButton.style.boxSizing = 'border-box';
+    moveJointToLeftButton.style.width = 'auto';
+    moveJointToRightButton.style.width = 'auto';
     customContainer.appendChild(moveJointToLeftButton);
     customContainer.appendChild(moveJointToRightButton);
     duplex_folder.domElement.appendChild(customContainer);
 
     if (folder2Title) {
         folder2Title.addEventListener('click', () => {
-            const display1 = customContainer.style.display === 'none' ? 'block' : 'none';
+            const display1 = customContainer.style.display === 'none' ? 'flex' : 'none';
             customContainer.style.display = display1;
         });
     }

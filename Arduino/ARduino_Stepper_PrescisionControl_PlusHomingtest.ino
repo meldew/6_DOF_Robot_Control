@@ -41,6 +41,20 @@ void loop() {
   J1_NormalOperation();
 }
 
+inline bool homePressed() {                 // INPUT_PULLUP: pressed = LOW
+  return digitalRead(homeSwitchPin) == LOW;
+}
+
+// one step with your timing; keeps your sign convention (HIGH = +1, LOW = -1)
+inline void stepOnce(bool dir, unsigned int us) {
+  digitalWrite(dirPin, dir);
+  digitalWrite(stepPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(stepPin, LOW);
+  delayMicroseconds(us);
+  currentPosition += dir ? 1 : -1;
+}
+
 void moveMotorNonBlocking(long steps, bool direction) {
   motorStepsRemaining = steps;
   motorDirection = direction;
@@ -49,7 +63,7 @@ void moveMotorNonBlocking(long steps, bool direction) {
 }
 
 
-bool readHomeStableLow(unsigned long hold_us = 7000) {  // ~3 ms
+bool readHomeStableLow(unsigned long hold_us = 25000) {  // ~3 ms
   unsigned long t0 = micros();
   while (micros() - t0 < hold_us) {
     if (digitalRead(homeSwitchPin) != LOW) return false;
@@ -84,26 +98,60 @@ void moveToAngle(float angle) {
 }
 
 void performHoming() {
-  digitalWrite(dirPin, LOW);
+  const bool HOMING_DIR = LOW;        // flip to HIGH if this moves away from the switch
+  const unsigned int STEP_US = 900;  // homing speed (bigger = slower)
+  const unsigned long DEBOUNCE_MS = 25;
+  const int RELEASE_MARGIN_STEPS = 200;  // extra after release
+  const int CLEARANCE_STEPS = 800;        // final back-off so we don't sit on switch
+  const long MAX_STEPS = stepsPerRevolution * 2L;
 
-  // Step until switch goes LOW (normal homing)
-  while (digitalRead(homeSwitchPin) == HIGH) {
-    takeStep();
-    currentPosition--;
+  auto pressed = [&](){ return digitalRead(homeSwitchPin) == LOW; }; // INPUT_PULLUP
+  auto pulse = [&](bool dir){
+    digitalWrite(dirPin, dir);
+    digitalWrite(stepPin, HIGH); delayMicroseconds(10);
+    digitalWrite(stepPin, LOW);  delayMicroseconds(STEP_US);
+  };
+
+  motorMoving = false; motorStepsRemaining = 0;
+
+  // If starting pressed, back off to get a clean HIGH
+  int k=0;
+  while (pressed() && k < RELEASE_MARGIN_STEPS) { pulse(!HOMING_DIR); k++; }
+  delay(10);
+
+  // 1) Approach until first press (or timeout)
+  long walked = 0;
+  while (!pressed()) {
+    pulse(HOMING_DIR);
+    if (++walked >= MAX_STEPS) { homingComplete = false; return; }
   }
 
-  if (!readHomeStableLow()) {
-    // False trigger (noise or bounce) — keep stepping until truly LOW
-    while (digitalRead(homeSwitchPin) == HIGH) {
-      takeStep();
-      currentPosition--;
+  // 2) Debounce: require LOW to hold for DEBOUNCE_MS
+  unsigned long t0 = millis();
+  while (millis() - t0 < DEBOUNCE_MS) {
+    if (!pressed()) {                 // bounced open -> keep approaching and restart timer
+      do { pulse(HOMING_DIR); if (++walked >= MAX_STEPS) { homingComplete=false; return; } }
+      while (!pressed());
+      t0 = millis();
     }
   }
 
-  // Then finalize
-  currentPosition = -120L * stepsPerRevolution / 360L;
+  // 3) Back off until released, then add margin
+  while (pressed()) { pulse(!HOMING_DIR); }
+  for (int i=0; i<RELEASE_MARGIN_STEPS; ++i) pulse(!HOMING_DIR);
+
+  // 4) Re-approach slowly to press again (clean edge)
+  while (!pressed()) { pulse(HOMING_DIR); }
+
+  // 5) Final tiny clearance and set reference
+  for (int i=0; i<CLEARANCE_STEPS; ++i) pulse(!HOMING_DIR);
+
+  // Your logical reference (example: home end = -120°)
+  currentPosition = (long)(-120.0 * stepsPerRevolution / 360.0);
   homingComplete = true;
 }
+
+
 
 
 void takeStep() {
